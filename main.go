@@ -6,8 +6,9 @@ import (
 	"log"
 	"math"
 	"os"
-	"strings"
+	"flag"
 
+	"github.com/aybabtme/rgbterm"
 	"github.com/nfnt/resize"
 
 	"image/jpeg"
@@ -15,10 +16,16 @@ import (
 	_ "image/png"
 )
 
+// Constants
 const scaleFactor float64 = 0.5
-const charWidth int = 10;
-const charHeight int = 18;
-const resizeWidth uint = 140;
+const charWidth int = 10
+const charHeight int = 18
+const resizeWidth uint = 100
+
+// Flag variables
+var imageFileName string
+var isColored bool
+
 
 func getImageFromFile(dir string) (image.Image, string, error) {
 	imgFile, err := os.Open(dir)
@@ -31,8 +38,8 @@ func getImageFromFile(dir string) (image.Image, string, error) {
 }
 
 // Get character from luminosity/grayscale value
-func getChar(val float64) string {
-	asciiMatrix := strings.Split("`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$", "")
+func getChar(val float64) byte {
+	asciiMatrix := []byte("`^\",:;Il!iXYUJCLQ0OZ#MW8B@$")
  
 	divisor := float64(256)/float64(len(asciiMatrix))
 
@@ -58,9 +65,31 @@ func printImage(img[][] string) {
 	}
 }
 
+func applyColor(r uint8, g uint8, b uint8, character byte) string {
+	return rgbterm.FgString(string([]byte{character}), r, g, b)
+}
+
+func init() {
+	const (
+		defaultImageFileName = "pic.jpg"
+		defaultIsColored = false
+	)
+	flag.StringVar(&imageFileName,
+		"f",
+		defaultImageFileName,
+		"Image file")
+	flag.BoolVar(&isColored,
+		"c",
+		defaultIsColored,
+		"Color the text")
+}
+
 func main() {
+	// Parse flags
+	flag.Parse()
+
 	// Get image
-	img, _, err := getImageFromFile("pic.jpg")
+	img, _, err := getImageFromFile(imageFileName)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -95,8 +124,15 @@ func main() {
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			lum := getLuminosityPt(x, y, img)
+			character := getChar(lum)
 
-			asciiImage[y][x] = getChar(lum) 
+			r, g, b, _ := img.At(x, y).RGBA()
+
+			if isColored {
+				asciiImage[y][x] = applyColor(uint8(r), uint8(g), uint8(b), character)
+			} else {
+				asciiImage[y][x] = string(character)
+			}
 		}
 	}
 
