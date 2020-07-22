@@ -16,6 +16,6 @@
 
 
 # Pictures
-*.jpg
-*.jpeg
-*.png
+/*.jpg
+/*.jpeg
+/*.png

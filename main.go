@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"image"
+	"image/color"
 	"log"
 	"math"
 	"os"
@@ -11,7 +12,6 @@ import (
 	"github.com/aybabtme/rgbterm"
 	"github.com/nfnt/resize"
 
-	"image/jpeg"
 	_ "image/jpeg"
 	_ "image/png"
 )
@@ -39,7 +39,7 @@ func getImageFromFile(dir string) (image.Image, string, error) {
 
 // Get character from luminosity/grayscale value
 func getChar(val float64) byte {
-	asciiMatrix := []byte("`^\",:;Il!iXYUJCLQ0OZ#MW8B@$")
+	asciiMatrix := []byte(" `^\":;Il!iXYUJCLQ0OZ#MW8B@$")
  
 	divisor := float64(256)/float64(len(asciiMatrix))
 
@@ -71,7 +71,7 @@ func applyColor(r uint8, g uint8, b uint8, character byte) string {
 
 func init() {
 	const (
-		defaultImageFileName = "pic.jpg"
+		defaultImageFileName = "images/bonin.jpg"
 		defaultIsColored = false
 	)
 	flag.StringVar(&imageFileName,
@@ -100,16 +100,6 @@ func main() {
 	img = resize.Resize(resizeWidth, 0, img, resize.Lanczos3)
 
 	bounds = img.Bounds()
-	
-	// Test resized
-	out, err := os.Create("test_resized.jpg")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer out.Close()
-
-	// write new image to file
-	jpeg.Encode(out, img, nil)
 
 	var w int = bounds.Max.X
 	var h int = bounds.Max.Y
@@ -126,7 +116,7 @@ func main() {
 			lum := getLuminosityPt(x, y, img)
 			character := getChar(lum)
 
-			r, g, b, _ := img.At(x, y).RGBA()
+			r, g, b, _ := color.NRGBAModel.Convert(img.At(x, y)).RGBA()
 
 			if isColored {
 				asciiImage[y][x] = applyColor(uint8(r), uint8(g), uint8(b), character)
