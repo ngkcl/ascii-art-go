@@ -8,7 +8,7 @@ A minimal Image to ASCII art converter written in Go.
 ## Example
 | Before                                                                                     | After                                                                                              |
 |:---------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------:|
-| ![](https://raw.githubusercontent.com/ngkcl/ascii-art-go/master/images/bonin.jpg =400x)      | ![](https://raw.githubusercontent.com/ngkcl/ascii-art-go/master/images/bonin-after.png =700x)
+| ![bonin](https://raw.githubusercontent.com/ngkcl/ascii-art-go/master/images/bonin.jpg)      | ![bonin after](https://raw.githubusercontent.com/ngkcl/ascii-art-go/master/images/bonin-after.png)
 
 ## Installation
 
